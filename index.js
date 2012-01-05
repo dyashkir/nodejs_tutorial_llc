@@ -5,6 +5,12 @@ var fs = require('fs');
 var peopleDictionary = {};
 peopleDictionary['dmytro yashkir'] = 1; //its a lie!
 
+var phrase = [ 
+      { limit:0, text: 'Your kind are not welcome here'},
+      {limit:1, text: 'Have you tried turning power off and then on?'},
+      {limit:2, text: 'lame joke 123'},
+      {limit:10, text: 'Go away stalker!'},
+      {limit:100000, text: 'something is terribly wrong'}];
 
 fs.readdir('csv_data', function(err, files) {
   
@@ -34,14 +40,22 @@ http.createServer(function (req, res) {
   if (parsedUrl.query.userName) {
     var name = parsedUrl.query.userName.trim();
 
-    if (peopleDictionary[name]) {
-      res.end(name + ' has attended ' + peopleDictionary[name] + ' times');
-    }else{
-      res.end(name + ' never attended :(');
+    //first lets retrieve the number of times user attended
+    var attendanceNumber = 0;
+    if (peopleDictionary[name]) {  //check if name is in the dictionary
+      attendanceNumber = peopleDictionary[name];
     }
+
+    var index = 0; //start with the very first phrase
+    do {
+      index++;     //increment by 1
+    }while ( phrase[index].limit <= attendanceNumber ); //check that user has attended enough
+  
+    res.end(phrase[index-1].text);
+  
   }else{
 
-    console.dir(peopleDictionary);
+    //console.dir(peopleDictionary);
     var page =
     '<!DOCTYPE html>'+
     '<form>' +
